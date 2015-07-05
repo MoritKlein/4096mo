@@ -1,0 +1,399 @@
+import java.awt.*; 
+import javax.swing.*; 
+import java.awt.event.*; 
+
+package Model;
+
+public class Logik extends JApplet implements KeyListener  {
+
+	static int[][]feld;
+	static int punkteZahl;
+	static int wieWeitDrinnen;
+	public Logik() {
+}
+	//todo : neueZahl nur wenn man einen zug gemacht hat in gg richtung !! 
+	public static void main(String[] args) {
+		//Spielfeldaufbau:
+		/*
+   		
+   		 
+   		 1.	   <-------x-------->      2.		<-------x-------->
+		 	
+ 		 	^    00 10 20 30 40 			  ^   0  1  2  3  4 
+		    |	 01 11 21 31 41			      |   5  6  7  8  9
+		    y	 02	12 22 32 42			      y   10 11 12 13 14
+		 	|    03 13 23 33 43				  |   15 16 17 18 19
+		 	v    04 14 24 34 44				  v   20 21 22 23 24
+		 	
+	(Feldaufbau bei Addition/Verschieben)    (Feldaufbau bei NeueZahl())
+		 	
+		 
+		 
+		 */
+		
+		
+		
+		feld = new int[5][5];
+		for(int y = 0;y<5;y++){
+			for(int x = 0;x<5;x++){
+				feld[0][y]= 0 ;
+				feld[1][y]= 0 ;
+				feld[2][y]= 0 ;
+				feld[3][y]= 0 ;
+				feld[4][y]= 8 ;
+			}
+		}
+		//feld[2][2]=8;
+		//feld[2][3]=8;
+		//feld[2][4]=8;
+		//initSpiel();
+	
+		//alles geht!!
+		
+}
+	
+	public static void visiualizeSYAP (){
+		System.out.println("Spielfeld:");
+		for (int y = 0; y<5;y++){
+			System.out.println(""+feld[0][y]+" "+feld[1][y]+" "+feld[2][y]+" "+feld[3][y]+" "+feld[4][y]+" ");
+		}
+
+}
+	public static int nurBewegen(int richtung,int x,int y,int wwD){
+		if(richtung==1){
+			//oben
+			int nummer = 0;
+			if(y+wwD <5){
+			if(feld[x][y+wwD]==0){
+				wwD++;
+				wieWeitDrinnen = wwD;
+				nummer = nurBewegen(richtung,x,y,wwD);
+			}else{
+				nummer= feld[x][y+wwD];
+			}
+			}
+			return nummer;
+					}else{
+		
+		if(richtung==2){
+		//rechts
+		int nummer = 0;
+		if(x-wwD >=0){
+		if(feld[x-wwD][y]==0){
+			wwD++;
+			wieWeitDrinnen = wwD;
+			nummer = nurBewegen(richtung,x,y,wwD);
+		}else{
+			nummer= feld[x-wwD][y];
+		}
+		}
+		return nummer;
+		}else{
+			
+			
+			if(richtung ==3){
+				//unten
+				int nummer = 0;
+				if(y-wwD >=0){
+				if(feld[x][y-wwD]==0){
+					wwD++;
+					wieWeitDrinnen = wwD;
+					nummer = nurBewegen(richtung,x,y,wwD);
+				}else{
+					nummer= feld[x][y-wwD];
+				}
+				}
+				return nummer;
+			}else{
+				//links(4)
+				int nummer = 0;
+				if(x+wwD <5){
+				if(feld[x+wwD][y]==0){
+					wwD++;
+					wieWeitDrinnen = wwD;
+					nummer = nurBewegen(richtung,x,y,wwD);
+				}else{
+					nummer= feld[x+wwD][y];
+				}
+				}
+				return nummer;			}
+		}
+		
+		
+		}
+}
+	
+	public static void bewegen (KeyEvent event){
+		System.out.println("");
+		System.out.println("");
+		System.out.println("Nächste Bewegung:");
+		int richtung = -1;
+
+		//1oben,2rechts,3unten,4links
+		if (event.getKeyCode() == KeyEvent.VK_UP){
+			richtung = 1;
+		}
+		if (event.getKeyCode() == KeyEvent.VK_RIGHT){
+			richtung = 2;
+		}
+		if (event.getKeyCode() == KeyEvent.VK_DOWN){
+			richtung = 3;
+		}
+		if (event.getKeyCode() == KeyEvent.VK_LEFT){
+			richtung = 4;
+		}
+		
+		if(obBewegBar()){ 
+		int [][] feld2 = new int [5][5];
+		//mit 0 belegen
+		for(int x = 0;x<5;x++){
+			for(int y = 0;y<5;y++){
+				feld2[x][y]=0;
+			}
+		}
+		
+		//evtl y+wieVieleAdds <4 nehnen !!!!!!!!!!!!!!!!
+		//oben 
+		if(richtung == 1){
+			for(int x = 0;x<5;x++){
+				wieWeitDrinnen = 0;
+				int wieVieleAdds = 0;
+				for(int y = 0;y<5;y++){	
+					feld2[x][y-wieVieleAdds]=nurBewegen(richtung,x,y,wieWeitDrinnen);
+					if(y>0){
+						//Noch ein kleiner Fehler 2.1-2
+						if(feld2[x][y-1-wieVieleAdds]==feld2[x][y-wieVieleAdds]){
+							feld2[x][y-1-wieVieleAdds]=2*feld2[x][y-wieVieleAdds];
+							wieVieleAdds++;
+						}
+					}				
+				}				
+		}System.out.println("Nach oben bewegt");
+		}
+		//rechts 
+		if(richtung == 2){
+			for(int y = 0;y<5;y++){
+				wieWeitDrinnen = 0;
+				int wieVieleAdds = 0;
+				for(int x = 4;x>=0;x--){	
+					feld2[x+wieVieleAdds][y]=nurBewegen(richtung,x,y,wieWeitDrinnen);
+					if(x<4){
+						//Noch ein kleiner Fehler 2.1-2
+						if(feld2[x+1+wieVieleAdds][y]==feld2[x+wieVieleAdds][y]){
+							feld2[x+1+wieVieleAdds][y]=2*feld2[x+wieVieleAdds][y];
+							wieVieleAdds++;
+						}
+					}				
+				}				
+		}System.out.println("Nach rechts bewegt");
+		}
+		
+		
+		//unten 
+				if(richtung == 3){
+					for(int x = 0;x<5;x++){
+						wieWeitDrinnen = 0;
+						int wieVieleAdds = 0;
+						for(int y = 4;y>=0;y--){	
+							feld2[x][y+wieVieleAdds]=nurBewegen(richtung,x,y,wieWeitDrinnen);
+							if(y<4){
+								//Noch ein kleiner Fehler 2.1-2
+								if(feld2[x][y+1+wieVieleAdds]==feld2[x][y+wieVieleAdds]){
+									feld2[x][y+1+wieVieleAdds]=2*feld2[x][y+wieVieleAdds];
+									wieVieleAdds++;
+								}
+							}				
+						}				
+				}System.out.println("Nach unten bewegt");
+				}
+				//links 
+				if(richtung == 4){
+					for(int y = 0;y<5;y++){
+						wieWeitDrinnen = 0;
+						int wieVieleAdds = 0;
+						for(int x = 0;x<4;x++){	
+							feld2[x-wieVieleAdds][y]=nurBewegen(richtung,x,y,wieWeitDrinnen);
+							if(x>0){
+								//Noch ein kleiner Fehler 2.1-2
+								if(feld2[x-1-wieVieleAdds][y]==feld2[x-wieVieleAdds][y]){
+									feld2[x-1-wieVieleAdds][y]=2*feld2[x-1-wieVieleAdds][y];
+									wieVieleAdds++;
+								}
+							}			
+						}				
+				}System.out.println("Nach links bewegt");
+				}
+		
+		
+				
+		boolean obGleich = true;
+		
+		for (int x = 0;x<5;x++){
+			for (int y = 0;y<5;y++){
+				if(feld2[x][y]!=feld[x][y]){
+					obGleich = false;
+				}
+			}
+		}
+				
+				
+				
+		///feld1 aktualisieren		
+		for(int y = 0;y<5;y++){
+			for(int x = 0;x<5;x++){
+				feld[x][y]=feld2[x][y];
+			}
+		}	
+		if(!obGleich){
+			neueZahl();
+		}
+		punkteBerechnen();
+		
+		}else{
+			//Du hast das Spiel verloren !!!!!!!!!!!!!!!!!!!!!!!!!!
+			System.out.println("verloren");
+		}
+}	
+
+	public static boolean obBewegBar(){
+		//fertig funkt !!
+		//void wird zu boolean
+		// evtl.
+		//alle richtungen durch probieren bzw nur N und O reicht evtl !.Ertst N dort 0|0 schaun ob 0 wenn ned dann schaun ob 1|0 gleich 0 wenn ned dannn schaun  ob gleich 0|0 dann das alles bei 1|0 mit 2|0
+		//vertical gehts schon !!
+		int gefunden = 2;
+		// wsf.falls des gleich null dann obbewegbar !!!!!!!!!!!!!!!!
+		for(int y = 0;y<5;y++){
+			for(int x = 0;x<4;x++){
+				if(gefunden == 2){
+							if(feld[x][y]==feld[x+1][y]){
+									gefunden = 1;
+									System.out.println("Bewegbar-x");								
+							}
+					}
+			}
+		}
+		for(int y = 0;y<4;y++){
+			for(int x = 0;x<5;x++){
+				if(gefunden == 2){
+							if(feld[x][y]==feld[x][y+1]){
+									gefunden = 1;
+									System.out.println("Bewegbar-y");
+							}
+					}
+			}
+		}		
+		if (gefunden == 2){
+			gefunden = 0;
+			System.out.println("Nicht bewegbar");		
+			return false;
+		}
+			if(gefunden == 1){
+				return true;
+			}else{
+				return false;
+			}
+}
+
+	public static void initSpiel (){
+		//wieviele sind frei ?? -> Auch: Ob mann verloren hat! 
+		for(int i =0;i<2;i++){
+			neueZahl();
+		}
+		punkteBerechnen();
+}
+	
+	static boolean obVerloren (){
+		if(wsf()==0){
+			//Wenn aus bewegen null zurückkommt !also keine Additon ausgeführt wurde bzw. keine ausgeführt werden kann !!
+			return true;	
+		}else{
+			return false;
+		}
+}
+	
+	static void punkteBerechnen(){
+		int punkte = 0;
+		for(int i = 0;i<5;i++){
+			for(int j = 0;j<5;j++){
+				punkte = punkte + feld[i][j] ;
+			}
+		}
+		System.out.println("Punktestand:"+punkte+"");
+}
+	
+	public static void neueZahl(){
+		int weite = wsf();
+		int range = zufallsZahl(weite);
+		int nummer = 0;
+		boolean gesetzt = false;
+		if(weite == 0){
+			System.out.println("Du hast verloren !!");
+		}else{
+		for (int i = 0;i<5;i++){
+			for(int j = 0;j<5;j++){
+				if (!gesetzt){
+				if(feld[i][j]==0){
+					if(nummer == range){
+						feld[i][j]=2;
+						nummer = 0;
+						gesetzt = true;
+					}else{
+						nummer++;
+					}
+				}	
+			}	
+		}
+		}
+		}
+}
+	
+	public static int wsf(){
+		int nummer= 0;
+		for(int i = 0;i<5;i++){
+			for(int j = 0 ;j<5;j++){
+				if(feld[i][j]==0){
+					nummer ++;
+				}
+			}
+		}
+		System.out.println("Es sind "+nummer+"frei");
+		return nummer;
+}
+	
+	public static int zufallsZahl(int weite){
+		/*Die Weite ist der Abstand der Zahlen die maximal ausgegeben werden können!
+		Also z.B Nur Zahlen bis 25. Diese Variable wird veränderbar sein.
+		Maximale Weite ist 100 bzw. ab da kann es zu komplikationen kommen und nicht alle Zahlen haben die gleich chance die zufallszahl zu werden !!*/
+		int zehnHoch = 1;
+		int zufall = (int) System.currentTimeMillis();
+		for (int i = 20;i>=0;i--){
+			if (zufall>zehnHoch(i)){
+				while(zufall-zehnHoch(i)>weite){
+					zufall = zufall -zehnHoch(i);
+				}	
+			}
+			if(zufall < 100){
+				if(zufall >= weite){
+					while(zufall-weite >= 0){
+						zufall = zufall -weite;
+					}				
+				}
+			}				
+		}
+		System.out.println("Zufallszahl ist :"+zufall+".");
+		return zufall;
+}
+	
+	static int zehnHoch(int x){
+		int y = 1;
+		for(int i = 0;i<x;i++){
+			y = y*10;
+		}
+		return y; 
+}
+	 public void keyReleased(KeyEvent event) {} 
+
+	 public void keyTyped(KeyEvent event) {} 
+	 
+	 public void keyPressed(KeyEvent event) {}
